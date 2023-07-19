@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PaginationControls from './PaginationControls.svelte';
 	export let data;
 </script>
 
@@ -17,6 +18,7 @@
 			</li>
 		{/each}
 	</ol>
+	<PaginationControls next={data.next} />
 </section>
 
 <style>

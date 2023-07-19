@@ -44,6 +44,11 @@ async function queryGraphQl(query: string, variables?: QueryVariables): Promise<
 	);
 }
 
+export interface Page<T> {
+	items: T[];
+	next: string | undefined;
+}
+
 export interface Discussion {
 	number: number;
 	title: string;
@@ -61,32 +66,40 @@ export interface DiscussionDetails extends Discussion {
 	bodyHTML: string;
 }
 
-export async function getDiscussionList(): Promise<Discussion[]> {
-	const body = await queryGraphQl(`
-		query discussionList($repoOwner: String!, $repoName: String!) {
+export async function getDiscussionList(next?: string): Promise<Page<Discussion>> {
+	const body = await queryGraphQl(
+		`query discussionList($repoOwner: String!, $repoName: String!, $after: String) {
 			repository(owner: $repoOwner, name: $repoName) {
-				discussions(last: 10) {
-					edges {
-						node {
-							number
-							title
-							author {
-								login
-							}
-							createdAt
+				discussions(first: 5, after: $after) {
+					pageInfo {
+						endCursor
+						hasNextPage
+					}
+					nodes {
+						number
+						title
+						author {
+							login
 						}
+						createdAt
 					}
 				}
 			}
-		}
-	`);
-	const discussions = (body as any).repository.discussions.edges;
-	return discussions.map((discussion: any) => ({
-		number: discussion.node.number,
-		title: discussion.node.title,
-		author: discussion.node.author.login,
-		createdAt: discussion.node.createdAt
+		}`,
+		{ after: next }
+	);
+	const pageInfo = (body as any).repository.discussions.pageInfo;
+	const discussions = (body as any).repository.discussions.nodes;
+	const items = discussions.map((discussion: any) => ({
+		number: discussion.number,
+		title: discussion.title,
+		author: discussion.author.login,
+		createdAt: discussion.createdAt
 	}));
+	return {
+		items,
+		next: pageInfo.hasNextPage ? pageInfo.endCursor : undefined
+	};
 }
 
 export async function getDiscussionDetails(number: number): Promise<DiscussionDetails> {
