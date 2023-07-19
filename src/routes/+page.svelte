@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PaginationControls from './PaginationControls.svelte';
 	export let data;
 	function prettyFormatTime(time: string): string {
 		const uploadTime = new Date(time);
@@ -29,6 +30,7 @@
 			</li>
 		{/each}
 	</ol>
+	<PaginationControls next={data.next} />
 </section>
 
 <style>
