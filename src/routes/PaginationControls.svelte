@@ -3,7 +3,9 @@
 </script>
 
 <div class="pagination">
-	<a href="?next={next}" hidden={next == null}>Next page</a>
+	{#if next != null}
+		<a href="?next={next}">Next page</a>
+	{/if}
 </div>
 
 <style>
