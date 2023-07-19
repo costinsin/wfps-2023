@@ -1,10 +1,20 @@
 <script lang="ts">
-	import { REACTION_EMOJI } from '../../../lib/reactions';
+	import { REACTION_EMOJI } from '$lib/reactions';
+	import type { DiscussionComment } from '$lib/server/github';
 	import AddReaction from './AddReaction.svelte';
+
 	export let data;
 
-	$: ({ discussion, comments } = data);
+	$: ({ discussionId, discussion, comments } = data);
 	$: currentReactions = discussion.reactionGroups.filter((group) => group.totalCount > 0);
+
+	async function loadReplies(comment: DiscussionComment) {
+		const response = await fetch(`/discussions/${discussionId}/comments/replies/${comment.id}`);
+		const replies = await response.json();
+
+		comment.replies = replies;
+		comments = comments;
+	}
 </script>
 
 <svelte:head>
@@ -33,15 +43,20 @@
 					{comment.author}
 					{comment.createdAt}
 					{@html comment.bodyHTML}
-					<ul>
-						{#each comment.replies as reply}
-							<li>
-								{reply.author}
-								{reply.createdAt}
-								{@html reply.bodyHTML}
-							</li>
-						{/each}
-					</ul>
+
+					{#if comment.replies !== null}
+						<ul>
+							{#each comment.replies as reply}
+								<li>
+									{reply.author}
+									{reply.createdAt}
+									{@html reply.bodyHTML}
+								</li>
+							{/each}
+						</ul>
+					{:else}
+						<button on:click={() => loadReplies(comment)}>Show replies</button>
+					{/if}
 				</li>
 			{/each}
 		</ul>

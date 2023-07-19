@@ -148,10 +148,11 @@ export interface DiscussionReply {
 }
 
 export interface DiscussionComment {
+	id: string;
 	author: string;
 	createdAt: string;
 	bodyHTML: string;
-	replies: DiscussionReply[];
+	replies: DiscussionReply[] | null;
 }
 
 export async function getDiscussionComments(number: number): Promise<DiscussionComment[]> {
@@ -163,23 +164,12 @@ export async function getDiscussionComments(number: number): Promise<DiscussionC
 					comments(last: 10) {
 						edges {
 							node {
+								id
 								author {
 									login
 								}
 								createdAt
 								bodyHTML
-								replies(last: 10) {
-									edges {
-										node {
-											author {
-												login
-											}
-											createdAt
-											bodyHTML
-										}
-									}
-
-								}
 							}
 						}
 					}
@@ -192,13 +182,45 @@ export async function getDiscussionComments(number: number): Promise<DiscussionC
 	const comments = (body as any).repository.discussion.comments.edges;
 
 	return comments.map((comment: any) => ({
+		id: comment.node.id,
 		author: comment.node.author.login,
 		createdAt: comment.node.createdAt,
 		bodyHTML: comment.node.bodyHTML,
-		replies: comment.node.replies.edges.map((reply: any) => ({
-			author: reply.node.author.login,
-			createdAt: reply.node.createdAt,
-			bodyHTML: reply.node.bodyHTML
-		}))
+		replies: null
+	}));
+}
+
+export async function getCommentReplies(commentId: string): Promise<DiscussionReply[]> {
+	const body = await queryGraphQl(
+		`
+		query commentReplies($commentId: ID!) {
+			node(id: $commentId) {
+				id
+				... on DiscussionComment {				
+					createdAt
+					replies(last: 10) {
+						totalCount
+						nodes {
+							id
+							author {
+								login
+							}
+							createdAt
+							bodyHTML
+						}
+					}
+			}
+			}
+		}
+	`,
+		{ commentId }
+	);
+
+	const replies = (body as any).node.replies.nodes;
+
+	return replies.map((reply: any) => ({
+		author: reply.author.login,
+		createdAt: reply.createdAt,
+		bodyHTML: reply.bodyHTML
 	}));
 }

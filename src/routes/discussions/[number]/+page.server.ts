@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit';
 
 import {
-	type DiscussionComment,
-	type DiscussionDetails,
 	getDiscussionComments,
-	getDiscussionDetails
+	getDiscussionDetails,
+	type DiscussionComment,
+	type DiscussionDetails
 } from '../../../lib/server/github';
 
 import type { PageServerLoad } from './$types';
@@ -22,5 +22,6 @@ export const load: PageServerLoad<Data> = async ({ params }) => {
 
 	const discussion = await getDiscussionDetails(number);
 	const comments = await getDiscussionComments(number);
-	return { discussion, comments };
+
+	return { discussionId: number, discussion, comments };
 };
