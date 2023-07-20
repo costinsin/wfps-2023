@@ -10,17 +10,17 @@
 	$: ({ discussionId, discussion, lazy } = data);
 	$: currentReactions = discussion.reactionGroups.filter((group) => group.totalCount > 0);
 
-	let loadingReplies: { [commentId: string]: boolean };
-	let replies: { [commentId: string]: DiscussionReply[] };
+	let loadingReplies: { [commentId: string]: boolean } = {};
+	let replies: { [commentId: string]: DiscussionReply[] } = {};
 
 	async function loadReplies(comment: DiscussionComment) {
 		loadingReplies[comment.id] = true;
 
 		const response = await fetch(`/discussions/${discussionId}/comments/replies/${comment.id}`);
-		const replies = await response.json();
+		const fetchedReplies = await response.json();
 
-		loadingReplies[comment.id] = true;
-		replies[comment.id] = replies;
+		loadingReplies[comment.id] = false;
+		replies[comment.id] = fetchedReplies;
 	}
 </script>
 
