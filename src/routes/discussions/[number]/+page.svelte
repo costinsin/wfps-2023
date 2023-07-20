@@ -2,6 +2,7 @@
 	import { REACTION_EMOJI } from '$lib/reactions';
 	import type { DiscussionComment } from '$lib/server/github';
 	import AddReaction from './AddReaction.svelte';
+	import AddReply from './AddReply.svelte';
 
 	export let data;
 
@@ -69,6 +70,8 @@
 					{:else}
 						<i>There are no replies to this comment</i>
 					{/if}
+
+					<AddReply />
 				</li>
 			{/each}
 		</ul>
