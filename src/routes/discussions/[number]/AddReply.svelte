@@ -14,15 +14,15 @@
 			<textarea
 				name="replyText"
 				bind:value={replyText}
-				placeholder="Say something..."
+				placeholder="Write a reply"
 				cols="100"
-				rows="10"
+				rows="5"
 			/>
 			<br />
-			<button type="submit">Save</button>
+			<button type="submit" disabled={replyText.length === 0}>Reply</button>
 			<button type="button" on:click={cancel}>Cancel</button>
 		</form>
 	{:else}
-		<button on:click={() => (formShown = !formShown)}>Add a new reply</button>
+		<input placeholder="Write a reply" size="100" on:focus={() => (formShown = !formShown)} />
 	{/if}
 </div>

@@ -27,6 +27,12 @@ export const load: PageServerLoad<Data> = async ({ params }) => {
 };
 
 export const actions: Actions = {
+	addComment: async (event) => {
+		const request = event.request;
+		const data = await request.formData();
+
+		console.log(`adding a new comment for discussion ${event.params.number}`, data);
+	},
 	addCommentReply: async (event) => {
 		const request = event.request;
 		const data = await request.formData();

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { REACTION_EMOJI } from '$lib/reactions';
 	import type { DiscussionComment } from '$lib/server/github';
+	import AddComment from './AddComment.svelte';
 	import AddReaction from './AddReaction.svelte';
 	import AddReply from './AddReply.svelte';
 
@@ -43,6 +44,9 @@
 		<AddReaction />
 	</div>
 	<div class="comments">
+		<hr />
+		<AddComment />
+		<hr />
 		<h2>Comments</h2>
 		<ul>
 			{#each comments as comment}
@@ -77,6 +81,3 @@
 		</ul>
 	</div>
 </section>
-
-<style>
-</style>
