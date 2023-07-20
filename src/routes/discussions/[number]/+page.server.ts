@@ -11,7 +11,9 @@ import type { PageServerLoad, Actions } from './$types';
 
 export interface Data {
 	discussion: DiscussionDetails;
-	comments: DiscussionComment[];
+	lazy: {
+		comments: Promise<DiscussionComment[]>;
+	};
 }
 
 export const load: PageServerLoad<Data> = async ({ params }) => {
@@ -21,9 +23,12 @@ export const load: PageServerLoad<Data> = async ({ params }) => {
 	}
 
 	const discussion = await getDiscussionDetails(number);
-	const comments = await getDiscussionComments(number);
 
-	return { discussionId: number, discussion, comments };
+	return {
+		discussionId: number,
+		discussion,
+		lazy: { comments: getDiscussionComments(number) }
+	};
 };
 
 export const actions: Actions = {

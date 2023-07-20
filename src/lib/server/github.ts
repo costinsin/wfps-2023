@@ -154,8 +154,6 @@ export interface DiscussionComment {
 	createdAt: string;
 	bodyHTML: string;
 	repliesCount: number;
-	repliesLoading: boolean;
-	replies: DiscussionReply[] | null;
 }
 
 export async function getDiscussionComments(number: number): Promise<DiscussionComment[]> {
@@ -190,9 +188,7 @@ export async function getDiscussionComments(number: number): Promise<DiscussionC
 		author: comment.author.login,
 		createdAt: comment.createdAt,
 		bodyHTML: comment.bodyHTML,
-		repliesCount: comment.replies.totalCount,
-		repliesLoading: false,
-		replies: null
+		repliesCount: comment.replies.totalCount
 	}));
 }
 
