@@ -1,11 +1,18 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import type { ActionResult } from '@sveltejs/kit';
 	import type { DiscussionComment, DiscussionReply } from '$lib/server/github';
 	import AddReply from './AddReply.svelte';
 
 	export let comment: DiscussionComment;
-	export let loadingReplies: boolean;
-	export let replies: DiscussionReply[] | undefined;
-	export let loadReplies: (comment: DiscussionComment) => Promise<void>;
+	let loadingReplies: boolean;
+	let replies: DiscussionReply[] | undefined;
+
+	function handleResult(result: ActionResult) {
+		if (result.type === 'success') {
+			replies = result.data as DiscussionReply[];
+		}
+	}
 </script>
 
 <li>
@@ -25,9 +32,22 @@
 				{/each}
 			</ul>
 		{:else}
-			<button on:click={() => loadReplies(comment)} disabled={loadingReplies}>
-				{#if loadingReplies}⌛{/if} Show replies
-			</button>
+			<form
+				method="POST"
+				action="?/loadCommentReplies"
+				use:enhance={() => {
+					loadingReplies = true;
+					return ({ result }) => {
+						loadingReplies = false;
+						handleResult(result);
+					};
+				}}
+			>
+				<input type="hidden" name="commentId" value={comment.id} />
+				<button disabled={loadingReplies}>
+					{#if loadingReplies}⌛{/if} Show replies
+				</button>
+			</form>
 		{/if}
 	{:else}
 		<i>There are no replies to this comment</i>

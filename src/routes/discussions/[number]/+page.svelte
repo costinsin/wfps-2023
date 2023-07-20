@@ -7,25 +7,13 @@
 
 	export let data;
 
-	$: ({ discussionId, discussion, lazy } = data);
+	$: ({ discussion, lazy } = data);
 	$: currentReactions = discussion.reactionGroups.filter((group) => group.totalCount > 0);
 
-	let loadingReplies: { [commentId: string]: boolean } = {};
-	let replies: { [commentId: string]: DiscussionReply[] } = {};
 	let newComments: DiscussionComment[] = [];
 
 	function onNewComment(comment: DiscussionComment) {
 		newComments = [comment, ...newComments];
-	}
-
-	async function loadReplies(comment: DiscussionComment) {
-		loadingReplies[comment.id] = true;
-
-		const response = await fetch(`/discussions/${discussionId}/comments/replies/${comment.id}`);
-		const fetchedReplies = await response.json();
-
-		loadingReplies[comment.id] = false;
-		replies[comment.id] = fetchedReplies;
 	}
 </script>
 
@@ -57,20 +45,10 @@
 		{:then comments}
 			<ul>
 				{#each newComments as comment}
-					<Comment
-						{comment}
-						loadingReplies={loadingReplies[comment.id]}
-						replies={replies[comment.id]}
-						{loadReplies}
-					/>
+					<Comment {comment} />
 				{/each}
 				{#each comments as comment}
-					<Comment
-						{comment}
-						loadingReplies={loadingReplies[comment.id]}
-						replies={replies[comment.id]}
-						{loadReplies}
-					/>
+					<Comment {comment} />
 				{/each}
 			</ul>
 		{:catch error}

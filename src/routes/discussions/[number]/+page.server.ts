@@ -3,8 +3,10 @@ import { error } from '@sveltejs/kit';
 import {
 	getDiscussionComments,
 	getDiscussionDetails,
+	getCommentReplies,
 	type DiscussionComment,
-	type DiscussionDetails
+	type DiscussionDetails,
+	type DiscussionReply
 } from '$lib/server/github';
 
 import type { PageServerLoad, Actions } from './$types';
@@ -32,6 +34,15 @@ export const load: PageServerLoad<Data> = async ({ params }) => {
 };
 
 export const actions: Actions = {
+	loadCommentReplies: async (event): Promise<DiscussionReply[]> => {
+		const data = await event.request.formData();
+		const commentId = data.get('commentId')?.toString();
+		if (!commentId) {
+			throw error(400);
+		}
+
+		return await getCommentReplies(commentId);
+	},
 	addComment: async (event): Promise<DiscussionComment> => {
 		const request = event.request;
 		const data = await request.formData();
