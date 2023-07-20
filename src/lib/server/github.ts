@@ -68,7 +68,8 @@ export interface DiscussionDetails extends Discussion {
 
 export async function getDiscussionList(next?: string): Promise<Page<Discussion>> {
 	const body = await queryGraphQl(
-		`query discussionList($repoOwner: String!, $repoName: String!, $after: String) {
+		`#graphql
+		query discussionList($repoOwner: String!, $repoName: String!, $after: String) {
 			repository(owner: $repoOwner, name: $repoName) {
 				discussions(first: 5, after: $after) {
 					pageInfo {
@@ -104,7 +105,7 @@ export async function getDiscussionList(next?: string): Promise<Page<Discussion>
 
 export async function getDiscussionDetails(number: number): Promise<DiscussionDetails> {
 	const body = await queryGraphQl(
-		`
+		`#graphql
     query discussionDetails($repoOwner: String!, $repoName: String!, $number: Int!) {
       repository(owner: $repoOwner, name: $repoName) {
         discussion(number: $number) {
@@ -152,24 +153,27 @@ export interface DiscussionComment {
 	author: string;
 	createdAt: string;
 	bodyHTML: string;
+	repliesCount: number;
+	repliesLoading: boolean;
 	replies: DiscussionReply[] | null;
 }
 
 export async function getDiscussionComments(number: number): Promise<DiscussionComment[]> {
 	const body = await queryGraphQl(
-		`
+		`#graphql
 		query discussionComments($repoOwner: String!, $repoName: String!, $number: Int!) {
 			repository(owner: $repoOwner, name: $repoName) {
 				discussion(number: $number) {
 					comments(last: 10) {
-						edges {
-							node {
-								id
-								author {
-									login
-								}
-								createdAt
-								bodyHTML
+						nodes {
+							id
+							author {
+								login
+							}
+							createdAt
+							bodyHTML
+							replies {
+								totalCount
 							}
 						}
 					}
@@ -179,27 +183,28 @@ export async function getDiscussionComments(number: number): Promise<DiscussionC
 	`,
 		{ number }
 	);
-	const comments = (body as any).repository.discussion.comments.edges;
+	const comments = (body as any).repository.discussion.comments.nodes;
 
 	return comments.map((comment: any) => ({
-		id: comment.node.id,
-		author: comment.node.author.login,
-		createdAt: comment.node.createdAt,
-		bodyHTML: comment.node.bodyHTML,
+		id: comment.id,
+		author: comment.author.login,
+		createdAt: comment.createdAt,
+		bodyHTML: comment.bodyHTML,
+		repliesCount: comment.replies.totalCount,
+		repliesLoading: false,
 		replies: null
 	}));
 }
 
 export async function getCommentReplies(commentId: string): Promise<DiscussionReply[]> {
 	const body = await queryGraphQl(
-		`
+		`#graphql
 		query commentReplies($commentId: ID!) {
 			node(id: $commentId) {
 				id
 				... on DiscussionComment {				
 					createdAt
 					replies(last: 10) {
-						totalCount
 						nodes {
 							id
 							author {
@@ -216,9 +221,9 @@ export async function getCommentReplies(commentId: string): Promise<DiscussionRe
 		{ commentId }
 	);
 
-	const replies = (body as any).node.replies.nodes;
+	const replies = (body as any).node.replies;
 
-	return replies.map((reply: any) => ({
+	return replies.nodes.map((reply: any) => ({
 		author: reply.author.login,
 		createdAt: reply.createdAt,
 		bodyHTML: reply.bodyHTML

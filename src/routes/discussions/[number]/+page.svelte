@@ -9,10 +9,16 @@
 	$: currentReactions = discussion.reactionGroups.filter((group) => group.totalCount > 0);
 
 	async function loadReplies(comment: DiscussionComment) {
+		comment.repliesLoading = true;
+		// Note(PK): this is how "reactivity magic" breaks
+		comments = comments;
+
 		const response = await fetch(`/discussions/${discussionId}/comments/replies/${comment.id}`);
 		const replies = await response.json();
 
+		comment.repliesLoading = false;
 		comment.replies = replies;
+		// Note(PK): this is how "reactivity magic" breaks
 		comments = comments;
 	}
 </script>
@@ -44,18 +50,24 @@
 					{comment.createdAt}
 					{@html comment.bodyHTML}
 
-					{#if comment.replies !== null}
-						<ul>
-							{#each comment.replies as reply}
-								<li>
-									{reply.author}
-									{reply.createdAt}
-									{@html reply.bodyHTML}
-								</li>
-							{/each}
-						</ul>
+					{#if comment.repliesCount > 0}
+						{#if comment.replies !== null}
+							<ul>
+								{#each comment.replies as reply}
+									<li>
+										{reply.author}
+										{reply.createdAt}
+										{@html reply.bodyHTML}
+									</li>
+								{/each}
+							</ul>
+						{:else}
+							<button on:click={() => loadReplies(comment)} disabled={comment.repliesLoading}>
+								{#if comment.repliesLoading}⌛{/if} Show replies
+							</button>
+						{/if}
 					{:else}
-						<button on:click={() => loadReplies(comment)}>Show replies</button>
+						<i>There are no replies to this comment</i>
 					{/if}
 				</li>
 			{/each}
