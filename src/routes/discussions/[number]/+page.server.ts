@@ -5,9 +5,9 @@ import {
 	getDiscussionDetails,
 	type DiscussionComment,
 	type DiscussionDetails
-} from '../../../lib/server/github';
+} from '$lib/server/github';
 
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 
 export interface Data {
 	discussion: DiscussionDetails;
@@ -24,4 +24,13 @@ export const load: PageServerLoad<Data> = async ({ params }) => {
 	const comments = await getDiscussionComments(number);
 
 	return { discussionId: number, discussion, comments };
+};
+
+export const actions: Actions = {
+	addCommentReply: async (event) => {
+		const request = event.request;
+		const data = await request.formData();
+
+		console.log(`adding a new reply for discussion ${event.params.number}`, data);
+	}
 };
