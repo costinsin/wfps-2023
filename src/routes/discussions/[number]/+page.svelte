@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { REACTION_EMOJI } from '$lib/reactions
+	import { REACTION_EMOJI } from '$lib/reactions';
 	import type { DiscussionComment, DiscussionReply } from '$lib/server/github';
 	import AddComment from './AddComment.svelte';
 	import AddReaction from './AddReaction.svelte';
