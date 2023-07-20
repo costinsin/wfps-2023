@@ -3,7 +3,7 @@
 	import type { DiscussionComment, DiscussionReply } from '$lib/server/github';
 	import AddComment from './AddComment.svelte';
 	import AddReaction from './AddReaction.svelte';
-	import AddReply from './AddReply.svelte';
+	import Comment from './Comment.svelte';
 
 	export let data;
 
@@ -12,6 +12,11 @@
 
 	let loadingReplies: { [commentId: string]: boolean } = {};
 	let replies: { [commentId: string]: DiscussionReply[] } = {};
+	let newComments: DiscussionComment[] = [];
+
+	function onNewComment(comment: DiscussionComment) {
+		newComments = [comment, ...newComments];
+	}
 
 	async function loadReplies(comment: DiscussionComment) {
 		loadingReplies[comment.id] = true;
@@ -44,41 +49,28 @@
 	</div>
 	<div class="comments">
 		<hr />
-		<AddComment />
+		<AddComment {onNewComment} />
 		<hr />
 		<h2>Comments</h2>
 		{#await lazy.comments}
 			Loading...
 		{:then comments}
 			<ul>
+				{#each newComments as comment}
+					<Comment
+						{comment}
+						loadingReplies={loadingReplies[comment.id]}
+						replies={replies[comment.id]}
+						{loadReplies}
+					/>
+				{/each}
 				{#each comments as comment}
-					<li>
-						{comment.author}
-						{comment.createdAt}
-						{@html comment.bodyHTML}
-
-						{#if comment.repliesCount > 0}
-							{#if replies[comment.id] != null}
-								<ul>
-									{#each replies[comment.id] as reply}
-										<li>
-											{reply.author}
-											{reply.createdAt}
-											{@html reply.bodyHTML}
-										</li>
-									{/each}
-								</ul>
-							{:else}
-								<button on:click={() => loadReplies(comment)} disabled={loadingReplies[comment.id]}>
-									{#if loadingReplies[comment.id]}⌛{/if} Show replies
-								</button>
-							{/if}
-						{:else}
-							<i>There are no replies to this comment</i>
-						{/if}
-
-						<AddReply />
-					</li>
+					<Comment
+						{comment}
+						loadingReplies={loadingReplies[comment.id]}
+						replies={replies[comment.id]}
+						{loadReplies}
+					/>
 				{/each}
 			</ul>
 		{:catch error}
