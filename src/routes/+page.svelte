@@ -2,8 +2,8 @@
 	import PaginationControls from './PaginationControls.svelte';
 	export let data;
 	function prettyFormatTime(time: string): string {
-		const uploadTime = new Date(time);
-		const currentTime = new Date();
+		const uploadTime = new Date(time).getTime();
+		const currentTime = Date.now();
 		const diff = currentTime - uploadTime;
 		if (diff <= 1000 * 60 * 60) {
 			return ` ${Math.round(diff / 1000 / 60)} minutes ago`;

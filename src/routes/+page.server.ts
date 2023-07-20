@@ -8,9 +8,11 @@ export interface Data {
 }
 
 export const load: PageServerLoad<Data> = async ({ fetch, url }) => {
-	const page = await getDiscussionList(url.searchParams.get('next'));
+	const page = await getDiscussionList(url.searchParams.get('next') ?? undefined);
 	return {
 		discussions: page.items,
 		next: page.next
 	};
 };
+
+export const csr = false;
