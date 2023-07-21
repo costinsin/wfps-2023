@@ -1,20 +1,26 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { REACTIONS, REACTION_EMOJI } from '../../../lib/reactions';
 
+	export let objectId: string;
 	let shown = false;
 
-	function addReaction(reaction: (typeof REACTIONS)[number]) {
-		console.log('react with', reaction);
+	const onReactionPost = () => {
 		shown = false;
-	}
+	};
 </script>
 
 <div class="add-reaction">
 	<button on:click={() => (shown = !shown)}>Add reaction</button>
 	<dialog open={shown}>
-		{#each REACTIONS as reaction}
-			<button on:click={() => addReaction(reaction)}>{REACTION_EMOJI[reaction]}</button>{' '}
-		{/each}
+		<form method="post" action="?/addReaction" use:enhance={onReactionPost}>
+			<input type="hidden" name="objectId" value={objectId} />
+			{#each REACTIONS as reaction}
+				<button type="submit" name="reaction" value={reaction}>
+					{REACTION_EMOJI[reaction]}
+				</button>{' '}
+			{/each}
+		</form>
 	</dialog>
 </div>
 
