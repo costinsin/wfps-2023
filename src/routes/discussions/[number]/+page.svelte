@@ -45,7 +45,7 @@
 				{group.totalCount}
 			</button>{' '}
 		{/each}
-		<AddReaction />
+		<AddReaction objectId={'' + discussionId} />
 	</div>
 	<div class="comments">
 		<hr />

@@ -51,5 +51,11 @@ export const actions: Actions = {
 		const data = await request.formData();
 
 		console.log(`adding a new reply for discussion ${event.params.number}`, data);
+	},
+	addReaction: async (event) => {
+		const request = event.request;
+		const data = await request.formData();
+
+		console.log(`adding a new reaction`, data);
 	}
 };
