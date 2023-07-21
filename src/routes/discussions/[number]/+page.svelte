@@ -1,14 +1,12 @@
 <script lang="ts">
-	import { REACTION_EMOJI } from '$lib/reactions';
 	import type { DiscussionComment, DiscussionReply } from '$lib/server/github';
 	import AddComment from './AddComment.svelte';
-	import AddReaction from './AddReaction.svelte';
 	import Comment from './Comment.svelte';
+	import Reactions from './Reactions.svelte';
 
 	export let data;
 
 	$: ({ discussionId, discussion, lazy } = data);
-	$: currentReactions = discussion.reactionGroups.filter((group) => group.totalCount > 0);
 
 	let loadingReplies: { [commentId: string]: boolean } = {};
 	let replies: { [commentId: string]: DiscussionReply[] } = {};
@@ -38,15 +36,9 @@
 	<h1>{discussion.title}</h1>
 	<p>by {discussion.author} on {discussion.createdAt}</p>
 	<div>{@html discussion.bodyHTML}</div>
-	<div class="reactions">
-		{#each currentReactions as group (group.content)}
-			<button disabled>
-				{REACTION_EMOJI[group.content]}
-				{group.totalCount}
-			</button>{' '}
-		{/each}
-		<AddReaction objectId={'' + discussionId} />
-	</div>
+
+	<Reactions reactions={discussion.reactionGroups} objectId={'' + discussionId} />
+
 	<div class="comments">
 		<hr />
 		<AddComment {onNewComment} />

@@ -134,18 +134,22 @@ export async function getDiscussionDetails(number: number): Promise<DiscussionDe
 		title: discussion.title,
 		author: discussion.author.login,
 		createdAt: discussion.createdAt,
-		reactionGroups: discussion.reactionGroups.map((group: any) => ({
-			content: group.content,
-			totalCount: group.reactors.totalCount
-		})),
+		reactionGroups: discussion.reactionGroups
+			.map((group: any) => ({
+				content: group.content,
+				totalCount: group.reactors.totalCount
+			}))
+			.filter((group) => group.totalCount > 0),
 		bodyHTML: discussion.bodyHTML
 	};
 }
 
 export interface DiscussionReply {
+	id: string;
 	author: string;
 	createdAt: string;
 	bodyHTML: string;
+	reactionGroups: ReactionGroup[];
 }
 
 export interface DiscussionComment {
@@ -154,6 +158,7 @@ export interface DiscussionComment {
 	createdAt: string;
 	bodyHTML: string;
 	repliesCount: number;
+	reactionGroups: ReactionGroup[];
 }
 
 export async function getDiscussionComments(number: number): Promise<DiscussionComment[]> {
@@ -173,6 +178,12 @@ export async function getDiscussionComments(number: number): Promise<DiscussionC
 							replies {
 								totalCount
 							}
+							reactionGroups {
+								content
+								reactors {
+									totalCount
+								}
+							}
 						}
 					}
 				}
@@ -188,7 +199,13 @@ export async function getDiscussionComments(number: number): Promise<DiscussionC
 		author: comment.author.login,
 		createdAt: comment.createdAt,
 		bodyHTML: comment.bodyHTML,
-		repliesCount: comment.replies.totalCount
+		repliesCount: comment.replies.totalCount,
+		reactionGroups: comment.reactionGroups
+			.map((group: any) => ({
+				content: group.content,
+				totalCount: group.reactors.totalCount
+			}))
+			.filter((group) => group.totalCount > 0)
 	}));
 }
 
@@ -208,6 +225,12 @@ export async function getCommentReplies(commentId: string): Promise<DiscussionRe
 							}
 							createdAt
 							bodyHTML
+							reactionGroups {
+								content
+								reactors {
+									totalCount
+								}
+							}
 						}
 					}
 			}
@@ -220,8 +243,15 @@ export async function getCommentReplies(commentId: string): Promise<DiscussionRe
 	const replies = (body as any).node.replies;
 
 	return replies.nodes.map((reply: any) => ({
+		id: reply.id,
 		author: reply.author.login,
 		createdAt: reply.createdAt,
-		bodyHTML: reply.bodyHTML
+		bodyHTML: reply.bodyHTML,
+		reactionGroups: reply.reactionGroups
+			.map((group: any) => ({
+				content: group.content,
+				totalCount: group.reactors.totalCount
+			}))
+			.filter((group) => group.totalCount > 0)
 	}));
 }

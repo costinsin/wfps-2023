@@ -11,7 +11,7 @@
 </script>
 
 <div class="add-reaction">
-	<button on:click={() => (shown = !shown)}>Add reaction</button>
+	<button on:click={() => (shown = true)}>Add reaction</button>
 	<dialog open={shown}>
 		<form method="post" action="?/addReaction" use:enhance={onReactionPost}>
 			<input type="hidden" name="objectId" value={objectId} />
