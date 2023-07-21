@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { REACTIONS, REACTION_EMOJI } from '../../../lib/reactions';
+	import { REACTIONS, REACTION_EMOJI } from '$lib/reactions';
 
 	export let objectId: string;
 	let shown = false;
