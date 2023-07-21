@@ -1,4 +1,5 @@
 <script>
+	import { navigating } from '$app/stores';
 	import Header from './Header.svelte';
 	import './styles.css';
 </script>
@@ -7,6 +8,9 @@
 	<Header />
 
 	<main>
+		<div>
+			{#if $navigating}Loading another page...{/if}
+		</div>
 		<slot />
 	</main>
 
