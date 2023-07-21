@@ -7,11 +7,9 @@
 	<h1>About this app</h1>
 
 	<p>
-		This is a <a href="https://kit.svelte.dev">SvelteKit</a> app. You can make your own by typing the
-		following into your command line and following the prompts:
+		This is a <a href="https://kit.svelte.dev">SvelteKit</a> app created for the Meta Framework Perspective
+		Summit.
 	</p>
-
-	<pre>npm create svelte@latest</pre>
 
 	<p>
 		The page you're looking at is purely static HTML, with no client-side interactivity needed.
@@ -20,4 +18,6 @@
 		mode, this page uses JavaScript to get hot reloading. If you open this page in
 		<code>npm run build && npm run preview</code> it has no JavaScript.
 	</p>
+
+	<p>Generated {new Date()}</p>
 </div>
